@@ -8,8 +8,8 @@ const font = "'IBM Plex Mono', 'JetBrains Mono', 'Fira Code', 'SF Mono', monospa
 
 const styles = {
   root: {
-    minHeight: '100vh', background: '#08080a', color: '#d4d4d8',
-    fontFamily: font, display: 'flex', flexDirection: 'column',
+    height: '100vh', background: '#08080a', color: '#d4d4d8',
+    fontFamily: font, display: 'flex', flexDirection: 'column', overflow: 'hidden',
   },
   header: {
     padding: '14px 20px', display: 'flex', alignItems: 'center',
@@ -31,7 +31,7 @@ const styles = {
   textarea: {
     flex: 1, background: 'transparent', border: 'none', padding: '14px 20px',
     color: '#d4d4d8', fontSize: 12.5, fontFamily: font, resize: 'none',
-    outline: 'none', lineHeight: 1.75, width: '100%',
+    outline: 'none', lineHeight: 1.75, width: '100%', overflowY: 'auto',
   },
   settingsPanel: {
     borderBottom: '1px solid #18181b', padding: '14px 20px', background: '#0a0a0d',
@@ -563,7 +563,7 @@ export default function App() {
       {/* ── Main Panels ── */}
       <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
         {/* Input */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', borderRight: '1px solid #18181b' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', borderRight: '1px solid #18181b', minHeight: 0 }}>
           <div style={styles.panelHeader}>
             <span style={styles.panelLabel}>Paste your text</span>
             {input && <button onClick={() => setInput('')} style={smallBtn}>Clear</button>}
@@ -577,7 +577,7 @@ export default function App() {
         </div>
 
         {/* Output */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
           <div style={styles.panelHeader}>
             <span style={styles.panelLabel}>Scrubbed output</span>
             {scrubbed && (
