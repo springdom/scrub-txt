@@ -111,16 +111,30 @@ export default function App() {
     setPatterns((prev) => prev.map((p) => (p.id === id ? { ...p, enabled: !p.enabled } : p)));
   }, []);
 
+  const [duplicateWarning, setDuplicateWarning] = useState('');
+
   const addCustomRule = useCallback(() => {
     const text = newRuleText.trim();
     if (!text) return;
+    // Check for duplicate (case-insensitive comparison)
+    const existing = customRules.find((r) => r.text.toLowerCase() === text.toLowerCase());
+    if (existing) {
+      const typeLabel = {
+        CUSTOM_PERSON: 'Person', CUSTOM_ORG: 'Company', CUSTOM_PROJECT: 'Project',
+        CUSTOM_LOCATION: 'Location', CUSTOM_OTHER: 'Other', CUSTOM: 'Custom',
+      }[existing.tag] || 'Custom';
+      setDuplicateWarning(`"${text}" already exists as ${typeLabel} — remove it first to change type`);
+      setTimeout(() => setDuplicateWarning(''), 3000);
+      return;
+    }
     setCustomRules((prev) => [
       ...prev,
       { id: `custom_${Date.now()}`, text, caseSensitive: newRuleCaseSensitive, tag: newRuleType },
     ]);
     setNewRuleText('');
     setNewRuleCaseSensitive(false);
-  }, [newRuleText, newRuleCaseSensitive, newRuleType]);
+    setDuplicateWarning('');
+  }, [newRuleText, newRuleCaseSensitive, newRuleType, customRules]);
 
   const removeCustomRule = useCallback((id) => {
     setCustomRules((prev) => prev.filter((r) => r.id !== id));
@@ -277,6 +291,15 @@ export default function App() {
                 }}
               >+</button>
             </div>
+            {duplicateWarning && (
+              <div style={{
+                fontSize: 10.5, color: '#f87171', marginBottom: 8,
+                padding: '5px 8px', background: '#1c1012', border: '1px solid #2d1519',
+                borderRadius: 4,
+              }}>
+                {duplicateWarning}
+              </div>
+            )}
             {customRules.length > 0 && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
                 {customRules.map((rule) => {
