@@ -117,6 +117,114 @@ export function createGenerators() {
       return `X${pad(i, 8)}`;
     },
 
+    PUBLIC_KEY: () => {
+      return '-----BEGIN PUBLIC KEY-----\nDUMMY_PUBLIC_KEY_PLACEHOLDER_DATA\n-----END PUBLIC KEY-----';
+    },
+
+    CERTIFICATE: () => {
+      return '-----BEGIN CERTIFICATE-----\nDUMMY_CERTIFICATE_PLACEHOLDER_DATA\n-----END CERTIFICATE-----';
+    },
+
+    SSH_PUB: () => {
+      const i = c('SSH_PUB');
+      return `ssh-ed25519 AAAA${'C3NzaC1lZDI1NTE5AAAAI'.padEnd(44, 'A')}dummy${pad(i)} user@dummy-host`;
+    },
+
+    AWS_SECRET: () => {
+      const i = c('AWS_SECRET');
+      return `aws_secret_access_key=${'A'.repeat(36)}${pad(i)}`;
+    },
+
+    AWS_TOKEN: () => {
+      const i = c('AWS_TOKEN');
+      return `aws_session_token=${'DummySessionToken'.padEnd(100, 'X')}${pad(i)}`;
+    },
+
+    GCP_KEY: () => {
+      const i = c('GCP_KEY');
+      return `AIzaDummy${'X'.repeat(26)}${pad(i)}`;
+    },
+
+    OAUTH_SECRET: () => {
+      const i = c('OAUTH_SECRET');
+      return `GOCSPX-DummyOAuthSecret${pad(i, 4)}`;
+    },
+
+    GITHUB_TOKEN: () => {
+      const i = c('GITHUB_TOKEN');
+      return `ghp_${'0'.repeat(32)}${pad(i)}`;
+    },
+
+    STRIPE_KEY: () => {
+      const i = c('STRIPE_KEY');
+      return `sk_test_${'0'.repeat(20)}${pad(i)}`;
+    },
+
+    SLACK_TOKEN: () => {
+      const i = c('SLACK_TOKEN');
+      return `xoxb-dummy-token-${pad(i)}`;
+    },
+
+    DISCORD_TOKEN: () => {
+      const i = c('DISCORD_TOKEN');
+      return `MTAwMDAwMDAwMDAwMDAwMDAw.DUMMY.${'-'.repeat(20)}${pad(i)}`;
+    },
+
+    WEBHOOK: () => {
+      const i = c('WEBHOOK');
+      return `https://hooks.example.com/dummy/webhook/${pad(i)}`;
+    },
+
+    TWILIO_KEY: () => {
+      const i = c('TWILIO_KEY');
+      return `AC${'0'.repeat(28)}${pad(i)}`;
+    },
+
+    NPM_TOKEN: () => {
+      const i = c('NPM_TOKEN');
+      return `npm_${'0'.repeat(32)}${pad(i)}`;
+    },
+
+    UUID_KEY: () => {
+      const i = c('UUID_KEY');
+      return `00000000-0000-0000-0000-${pad(i, 12)}`;
+    },
+
+    AZURE_KEY: () => {
+      const i = c('AZURE_KEY');
+      return `AccountKey=${'DummyAzureKey0000'.padEnd(44, '=')}${pad(i)}`;
+    },
+
+    BEARER: () => {
+      const i = c('BEARER');
+      return `Bearer dummy_bearer_${'0'.repeat(20)}${pad(i)}`;
+    },
+
+    BASIC_AUTH: () => {
+      const i = c('BASIC_AUTH');
+      return `Basic ${btoa(`dummy_user_${i}:dummy_pass_${i}`)}`;
+    },
+
+    PASSWORD: (original) => {
+      const i = c('PASSWORD');
+      const eqMatch = original.match(/[=:]\s*/);
+      if (eqMatch) {
+        const prefix = original.slice(0, original.indexOf(eqMatch[0]) + eqMatch[0].length);
+        return `${prefix}dummy_password_${i}`;
+      }
+      return `password=dummy_password_${i}`;
+    },
+
+    SECRET: () => {
+      const i = c('SECRET');
+      return `secret=dummy_secret_${'0'.repeat(16)}${pad(i)}`;
+    },
+
+    ENTROPY: () => {
+      const i = c('ENTROPY');
+      return `DummyHighEntropyString${'0'.repeat(20)}${pad(i)}`;
+    },
+
     CUSTOM: (original) => {
       const i = c('CUSTOM');
       const first = FAKE_FIRST[(i - 1) % FAKE_FIRST.length];

@@ -12,7 +12,9 @@
  */
 
 export const PATTERNS = [
+  // ══════════════════════════════════════
   // ── Personal Info ──
+  // ══════════════════════════════════════
   {
     id: 'email',
     label: 'Emails',
@@ -68,7 +70,9 @@ export const PATTERNS = [
     group: 'Personal Info',
   },
 
+  // ══════════════════════════════════════
   // ── Financial ──
+  // ══════════════════════════════════════
   {
     id: 'credit_card',
     label: 'Credit Cards',
@@ -82,54 +86,348 @@ export const PATTERNS = [
     },
   },
 
-  // ── Auth & Secrets ──
+  // ══════════════════════════════════════
+  // ── Keys & Secrets ──
+  // ══════════════════════════════════════
+
+  // -- PEM Encoded Keys --
   {
-    id: 'api_key',
-    label: 'API Keys',
+    id: 'private_key_pem',
+    label: 'Private Keys (PEM)',
     enabled: true,
-    regex: /(?:sk|pk|api|key|token|secret|bearer|auth)[-_]?[a-zA-Z0-9\-_]{20,}/gi,
-    tag: 'API_KEY',
-    group: 'Auth & Secrets',
+    regex: /-----BEGIN (?:RSA |EC |DSA |OPENSSH |ENCRYPTED )?PRIVATE KEY-----[\s\S]*?-----END (?:RSA |EC |DSA |OPENSSH |ENCRYPTED )?PRIVATE KEY-----/g,
+    tag: 'PRIVATE_KEY',
+    group: 'Keys & Secrets',
   },
   {
-    id: 'aws_key',
-    label: 'AWS Keys',
+    id: 'public_key_pem',
+    label: 'Public Keys (PEM)',
+    enabled: true,
+    regex: /-----BEGIN (?:RSA |EC |DSA |OPENSSH )?PUBLIC KEY-----[\s\S]*?-----END (?:RSA |EC |DSA |OPENSSH )?PUBLIC KEY-----/g,
+    tag: 'PUBLIC_KEY',
+    group: 'Keys & Secrets',
+  },
+  {
+    id: 'certificate_pem',
+    label: 'Certificates (PEM)',
+    enabled: true,
+    regex: /-----BEGIN CERTIFICATE-----[\s\S]*?-----END CERTIFICATE-----/g,
+    tag: 'CERTIFICATE',
+    group: 'Keys & Secrets',
+  },
+
+  // -- SSH Keys --
+  {
+    id: 'ssh_public',
+    label: 'SSH Public Keys',
+    enabled: true,
+    regex: /(?:ssh-rsa|ssh-ed25519|ssh-dss|ecdsa-sha2-nistp(?:256|384|521))\s+[A-Za-z0-9+\/=]{40,}(?:\s+\S+)?/g,
+    tag: 'SSH_PUB',
+    group: 'Keys & Secrets',
+  },
+
+  // -- AWS --
+  {
+    id: 'aws_access_key',
+    label: 'AWS Access Keys',
     enabled: true,
     regex: /(?:AKIA|ABIA|ACCA|ASIA)[0-9A-Z]{16}/g,
     tag: 'AWS_KEY',
-    group: 'Auth & Secrets',
+    group: 'Keys & Secrets',
   },
+  {
+    id: 'aws_secret_key',
+    label: 'AWS Secret Keys',
+    enabled: true,
+    regex: /(?:aws_secret_access_key|aws_secret_key|AWS_SECRET_ACCESS_KEY)[\s]*[=:]\s*[A-Za-z0-9\/+=]{40}/g,
+    tag: 'AWS_SECRET',
+    group: 'Keys & Secrets',
+  },
+
+  // -- Google / GCP --
+  {
+    id: 'gcp_api_key',
+    label: 'Google API Keys',
+    enabled: true,
+    regex: /AIza[0-9A-Za-z\-_]{35}/g,
+    tag: 'GCP_KEY',
+    group: 'Keys & Secrets',
+  },
+  {
+    id: 'gcp_service_account',
+    label: 'GCP Service Account',
+    enabled: true,
+    regex: /"private_key":\s*"-----BEGIN[^"]*-----END[^"]*"/g,
+    tag: 'PRIVATE_KEY',
+    group: 'Keys & Secrets',
+  },
+  {
+    id: 'gcp_oauth',
+    label: 'Google OAuth Secret',
+    enabled: true,
+    regex: /GOCSPX-[A-Za-z0-9\-_]{28}/g,
+    tag: 'OAUTH_SECRET',
+    group: 'Keys & Secrets',
+  },
+
+  // -- OpenAI / Anthropic --
+  {
+    id: 'openai_key',
+    label: 'OpenAI Keys',
+    enabled: true,
+    regex: /sk-(?:proj-)?[A-Za-z0-9\-_]{20,}/g,
+    tag: 'API_KEY',
+    group: 'Keys & Secrets',
+  },
+  {
+    id: 'anthropic_key',
+    label: 'Anthropic Keys',
+    enabled: true,
+    regex: /sk-ant-[A-Za-z0-9\-_]{20,}/g,
+    tag: 'API_KEY',
+    group: 'Keys & Secrets',
+  },
+
+  // -- GitHub --
+  {
+    id: 'github_pat',
+    label: 'GitHub PAT',
+    enabled: true,
+    regex: /ghp_[A-Za-z0-9]{36}/g,
+    tag: 'GITHUB_TOKEN',
+    group: 'Keys & Secrets',
+  },
+  {
+    id: 'github_oauth',
+    label: 'GitHub OAuth',
+    enabled: true,
+    regex: /gho_[A-Za-z0-9]{36}/g,
+    tag: 'GITHUB_TOKEN',
+    group: 'Keys & Secrets',
+  },
+  {
+    id: 'github_app_token',
+    label: 'GitHub App Tokens',
+    enabled: true,
+    regex: /(?:ghu|ghs|ghr)_[A-Za-z0-9]{36}/g,
+    tag: 'GITHUB_TOKEN',
+    group: 'Keys & Secrets',
+  },
+  {
+    id: 'github_fine_grained',
+    label: 'GitHub Fine-Grained',
+    enabled: true,
+    regex: /github_pat_[A-Za-z0-9_]{22,}/g,
+    tag: 'GITHUB_TOKEN',
+    group: 'Keys & Secrets',
+  },
+
+  // -- Stripe --
+  {
+    id: 'stripe_secret',
+    label: 'Stripe Secret',
+    enabled: true,
+    regex: /(?:sk|rk)_(?:live|test)_[A-Za-z0-9]{20,}/g,
+    tag: 'STRIPE_KEY',
+    group: 'Keys & Secrets',
+  },
+  {
+    id: 'stripe_publishable',
+    label: 'Stripe Publishable',
+    enabled: true,
+    regex: /pk_(?:live|test)_[A-Za-z0-9]{20,}/g,
+    tag: 'STRIPE_KEY',
+    group: 'Keys & Secrets',
+  },
+
+  // -- Slack --
+  {
+    id: 'slack_token',
+    label: 'Slack Tokens',
+    enabled: true,
+    regex: /xox[bpras]-[A-Za-z0-9\-]{10,}/g,
+    tag: 'SLACK_TOKEN',
+    group: 'Keys & Secrets',
+  },
+  {
+    id: 'slack_webhook',
+    label: 'Slack Webhooks',
+    enabled: true,
+    regex: /https:\/\/hooks\.slack\.com\/services\/T[A-Z0-9]{8,}\/B[A-Z0-9]{8,}\/[A-Za-z0-9]{20,}/g,
+    tag: 'WEBHOOK',
+    group: 'Keys & Secrets',
+  },
+
+  // -- Discord --
+  {
+    id: 'discord_token',
+    label: 'Discord Tokens',
+    enabled: true,
+    regex: /(?:mfa\.[A-Za-z0-9\-_]{80,}|[MN][A-Za-z0-9]{23,}\.[A-Za-z0-9\-_]{6}\.[A-Za-z0-9\-_]{27,})/g,
+    tag: 'DISCORD_TOKEN',
+    group: 'Keys & Secrets',
+  },
+  {
+    id: 'discord_webhook',
+    label: 'Discord Webhooks',
+    enabled: true,
+    regex: /https:\/\/(?:discord|discordapp)\.com\/api\/webhooks\/\d{17,}\/[A-Za-z0-9\-_]{60,}/g,
+    tag: 'WEBHOOK',
+    group: 'Keys & Secrets',
+  },
+
+  // -- Twilio --
+  {
+    id: 'twilio_sid',
+    label: 'Twilio SID',
+    enabled: true,
+    regex: /(?:AC|SK)[a-f0-9]{32}/g,
+    tag: 'TWILIO_KEY',
+    group: 'Keys & Secrets',
+  },
+
+  // -- SendGrid --
+  {
+    id: 'sendgrid_key',
+    label: 'SendGrid Keys',
+    enabled: true,
+    regex: /SG\.[A-Za-z0-9\-_]{22}\.[A-Za-z0-9\-_]{43}/g,
+    tag: 'API_KEY',
+    group: 'Keys & Secrets',
+  },
+
+  // -- Mailgun --
+  {
+    id: 'mailgun_key',
+    label: 'Mailgun Keys',
+    enabled: true,
+    regex: /key-[A-Za-z0-9]{32}/g,
+    tag: 'API_KEY',
+    group: 'Keys & Secrets',
+  },
+
+  // -- Firebase --
+  {
+    id: 'firebase_key',
+    label: 'Firebase Keys',
+    enabled: true,
+    regex: /AAAA[A-Za-z0-9_-]{7}:[A-Za-z0-9_-]{140}/g,
+    tag: 'API_KEY',
+    group: 'Keys & Secrets',
+  },
+
+  // -- NPM --
+  {
+    id: 'npm_token',
+    label: 'NPM Tokens',
+    enabled: true,
+    regex: /npm_[A-Za-z0-9]{36}/g,
+    tag: 'NPM_TOKEN',
+    group: 'Keys & Secrets',
+  },
+
+  // -- PyPI --
+  {
+    id: 'pypi_token',
+    label: 'PyPI Tokens',
+    enabled: true,
+    regex: /pypi-[A-Za-z0-9\-_]{50,}/g,
+    tag: 'API_KEY',
+    group: 'Keys & Secrets',
+  },
+
+  // -- Vercel --
+  {
+    id: 'vercel_token',
+    label: 'Vercel Tokens',
+    enabled: true,
+    regex: /(?:vercel_|vc_prod_|vc_)[A-Za-z0-9]{20,}/gi,
+    tag: 'API_KEY',
+    group: 'Keys & Secrets',
+  },
+
+  // -- Supabase --
+  {
+    id: 'supabase_key',
+    label: 'Supabase Keys',
+    enabled: true,
+    regex: /sbp_[a-f0-9]{40}/g,
+    tag: 'API_KEY',
+    group: 'Keys & Secrets',
+  },
+
+  // -- Shopify --
+  {
+    id: 'shopify_token',
+    label: 'Shopify Tokens',
+    enabled: true,
+    regex: /shp(?:at|ca|pa|ss)_[a-fA-F0-9]{32}/g,
+    tag: 'API_KEY',
+    group: 'Keys & Secrets',
+  },
+
+  // -- Azure --
+  {
+    id: 'azure_key',
+    label: 'Azure Keys',
+    enabled: true,
+    regex: /(?:AccountKey|SharedAccessKey)=[A-Za-z0-9+\/=]{40,}/g,
+    tag: 'AZURE_KEY',
+    group: 'Keys & Secrets',
+  },
+
+  // -- Datadog --
+  {
+    id: 'datadog_key',
+    label: 'Datadog Keys',
+    enabled: true,
+    regex: /(?:dd-api-key|DD_API_KEY|datadog_api_key)[\s]*[=:]\s*[a-f0-9]{32}/gi,
+    tag: 'API_KEY',
+    group: 'Keys & Secrets',
+  },
+
+  // ══════════════════════════════════════
+  // ── Auth & Config ──
+  // ══════════════════════════════════════
   {
     id: 'jwt',
     label: 'JWT Tokens',
     enabled: true,
     regex: /eyJ[a-zA-Z0-9_-]{10,}\.eyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}/g,
     tag: 'JWT',
-    group: 'Auth & Secrets',
+    group: 'Auth & Config',
+  },
+  {
+    id: 'bearer_token',
+    label: 'Bearer Tokens',
+    enabled: true,
+    regex: /Bearer\s+[A-Za-z0-9\-_\.]{20,}/g,
+    tag: 'BEARER',
+    group: 'Auth & Config',
+  },
+  {
+    id: 'basic_auth',
+    label: 'Basic Auth',
+    enabled: true,
+    regex: /Basic\s+[A-Za-z0-9+\/=]{10,}/g,
+    tag: 'BASIC_AUTH',
+    group: 'Auth & Config',
   },
   {
     id: 'url_auth',
     label: 'Auth URLs',
     enabled: true,
-    regex: /https?:\/\/[^\s]*[?&](?:token|key|api_key|secret|password|auth)=[^\s&]*/gi,
+    regex: /https?:\/\/[^\s]*[?&](?:token|key|api_key|secret|password|auth|access_token)=[^\s&]*/gi,
     tag: 'AUTH_URL',
-    group: 'Auth & Secrets',
+    group: 'Auth & Config',
   },
   {
     id: 'conn_string',
     label: 'Connection Strings',
     enabled: true,
-    regex: /(?:mongodb(?:\+srv)?|postgres(?:ql)?|mysql|redis|amqp):\/\/[^\s]+/gi,
+    regex: /(?:mongodb(?:\+srv)?|postgres(?:ql)?|mysql|redis|amqp|mssql):\/\/[^\s]+/gi,
     tag: 'CONN_STRING',
-    group: 'Auth & Secrets',
-  },
-  {
-    id: 'private_key',
-    label: 'Private Keys',
-    enabled: true,
-    regex: /-----BEGIN (?:RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----[\s\S]*?-----END (?:RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----/g,
-    tag: 'PRIVATE_KEY',
-    group: 'Auth & Secrets',
+    group: 'Auth & Config',
   },
   {
     id: 'env_var',
@@ -137,10 +435,44 @@ export const PATTERNS = [
     enabled: true,
     regex: /(?:^|\s)(?:export\s+)?[A-Z_]{2,}(?:_KEY|_SECRET|_TOKEN|_PASSWORD|_PASS|_API|_AUTH|_CREDENTIAL)=[^\s]+/gm,
     tag: 'ENV_VAR',
-    group: 'Auth & Secrets',
+    group: 'Auth & Config',
+  },
+  {
+    id: 'password_field',
+    label: 'Passwords',
+    enabled: true,
+    regex: /(?:password|passwd|pwd)[\s]*[=:]\s*["']?[^\s"',]{6,}["']?/gi,
+    tag: 'PASSWORD',
+    group: 'Auth & Config',
+  },
+  {
+    id: 'generic_secret',
+    label: 'Generic Secrets',
+    enabled: false,
+    regex: /(?:secret|private|credential)[\s]*[=:]\s*["']?[A-Za-z0-9\-_\/+=]{16,}["']?/gi,
+    tag: 'SECRET',
+    group: 'Auth & Config',
+  },
+  {
+    id: 'high_entropy',
+    label: 'High-Entropy Strings',
+    enabled: false,
+    regex: /[A-Za-z0-9\-_]{40,}/g,
+    tag: 'ENTROPY',
+    group: 'Auth & Config',
+    validate: (match) => {
+      const chars = new Set(match.split(''));
+      const ratio = chars.size / match.length;
+      const hasUpper = /[A-Z]/.test(match);
+      const hasLower = /[a-z]/.test(match);
+      const hasDigit = /[0-9]/.test(match);
+      return ratio > 0.4 && hasUpper && hasLower && hasDigit;
+    },
   },
 
+  // ══════════════════════════════════════
   // ── Network ──
+  // ══════════════════════════════════════
   {
     id: 'ipv4',
     label: 'IPv4',
