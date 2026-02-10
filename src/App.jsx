@@ -98,6 +98,7 @@ export default function App() {
   const [customRules, setCustomRules] = useState([]);
   const [newRuleText, setNewRuleText] = useState('');
   const [newRuleCaseSensitive, setNewRuleCaseSensitive] = useState(false);
+  const [newRuleType, setNewRuleType] = useState('CUSTOM_PERSON');
   const [showSettings, setShowSettings] = useState(false);
   const [showMapping, setShowMapping] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -115,11 +116,11 @@ export default function App() {
     if (!text) return;
     setCustomRules((prev) => [
       ...prev,
-      { id: `custom_${Date.now()}`, text, caseSensitive: newRuleCaseSensitive, tag: 'CUSTOM' },
+      { id: `custom_${Date.now()}`, text, caseSensitive: newRuleCaseSensitive, tag: newRuleType },
     ]);
     setNewRuleText('');
     setNewRuleCaseSensitive(false);
-  }, [newRuleText, newRuleCaseSensitive]);
+  }, [newRuleText, newRuleCaseSensitive, newRuleType]);
 
   const removeCustomRule = useCallback((id) => {
     setCustomRules((prev) => prev.filter((r) => r.id !== id));
@@ -225,16 +226,37 @@ export default function App() {
           <div style={{ marginBottom: 18 }}>
             <div style={styles.sectionTitle}>Custom Words & Phrases</div>
             <div style={{ fontSize: 10.5, color: '#3f3f46', marginBottom: 8 }}>
-              Names, codenames, companies — replaced with realistic fake names
+              Add names, companies, projects, or locations — replaced with matching fake data
             </div>
-            <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+            <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
               <input
                 value={newRuleText}
                 onChange={(e) => setNewRuleText(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && addCustomRule()}
-                placeholder="e.g. Matt, Project Falcon, Acme Corp..."
-                style={styles.input}
+                placeholder={
+                  newRuleType === 'CUSTOM_PERSON' ? 'e.g. Matt Johnson, Sarah...' :
+                  newRuleType === 'CUSTOM_ORG' ? 'e.g. Acme Corp, SpaceX...' :
+                  newRuleType === 'CUSTOM_PROJECT' ? 'e.g. Project Falcon, Moonshot...' :
+                  newRuleType === 'CUSTOM_LOCATION' ? 'e.g. 742 Evergreen Terrace...' :
+                  'e.g. any sensitive text...'
+                }
+                style={{ ...styles.input, minWidth: 180 }}
               />
+              <select
+                value={newRuleType}
+                onChange={(e) => setNewRuleType(e.target.value)}
+                style={{
+                  background: '#0e0e11', border: '1px solid #1e1e22', borderRadius: 5,
+                  padding: '7px 8px', color: '#d4d4d8', fontSize: 11, outline: 'none',
+                  fontFamily: font, cursor: 'pointer',
+                }}
+              >
+                <option value="CUSTOM_PERSON">👤 Person</option>
+                <option value="CUSTOM_ORG">🏢 Company</option>
+                <option value="CUSTOM_PROJECT">📁 Project</option>
+                <option value="CUSTOM_LOCATION">📍 Location</option>
+                <option value="CUSTOM_OTHER">🏷️ Other</option>
+              </select>
               <label style={{
                 display: 'flex', alignItems: 'center', gap: 3,
                 fontSize: 10, color: '#52525b', cursor: 'pointer', whiteSpace: 'nowrap',
@@ -257,16 +279,23 @@ export default function App() {
             </div>
             {customRules.length > 0 && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-                {customRules.map((rule) => (
-                  <span key={rule.id} style={customChip}>
-                    <span style={{ color: '#e44d26' }}>{rule.text}</span>
-                    {rule.caseSensitive && <span style={{ color: '#3f3f46', fontSize: 8 }}>Aa</span>}
-                    <span
-                      onClick={() => removeCustomRule(rule.id)}
-                      style={{ color: '#3f3f46', cursor: 'pointer', fontSize: 13, lineHeight: 1 }}
-                    >×</span>
-                  </span>
-                ))}
+                {customRules.map((rule) => {
+                  const typeLabel = {
+                    CUSTOM_PERSON: '👤', CUSTOM_ORG: '🏢', CUSTOM_PROJECT: '📁',
+                    CUSTOM_LOCATION: '📍', CUSTOM_OTHER: '🏷️', CUSTOM: '🏷️',
+                  }[rule.tag] || '🏷️';
+                  return (
+                    <span key={rule.id} style={customChip}>
+                      <span style={{ fontSize: 10 }}>{typeLabel}</span>
+                      <span style={{ color: TAG_COLORS[rule.tag] || '#e44d26' }}>{rule.text}</span>
+                      {rule.caseSensitive && <span style={{ color: '#3f3f46', fontSize: 8 }}>Aa</span>}
+                      <span
+                        onClick={() => removeCustomRule(rule.id)}
+                        style={{ color: '#3f3f46', cursor: 'pointer', fontSize: 13, lineHeight: 1 }}
+                      >×</span>
+                    </span>
+                  );
+                })}
               </div>
             )}
           </div>

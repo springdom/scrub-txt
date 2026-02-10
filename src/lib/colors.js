@@ -56,4 +56,9 @@ export const TAG_COLORS = {
 
   // Custom
   CUSTOM: '#e44d26',
+  CUSTOM_PERSON: '#e44d26',
+  CUSTOM_ORG: '#f97316',
+  CUSTOM_PROJECT: '#eab308',
+  CUSTOM_LOCATION: '#14b8a6',
+  CUSTOM_OTHER: '#71717a',
 };
