@@ -27,7 +27,7 @@ This Code of Conduct applies to all project spaces — GitHub issues, pull reque
 
 ## Enforcement
 
-Instances of unacceptable behavior may be reported by contacting the project team at conduct@springdom.com. All reports will be reviewed and investigated promptly and fairly. The project team is obligated to maintain confidentiality with regard to the reporter.
+Instances of unacceptable behavior may be reported by contacting the project team at opening an issue at https://github.com/springdom/scrub-txt/issues. All reports will be reviewed and investigated promptly and fairly. The project team is obligated to maintain confidentiality with regard to the reporter.
 
 ## Attribution
 

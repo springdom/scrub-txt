@@ -4,7 +4,7 @@
 
 If you discover a security vulnerability in scrub.txt, **please do not open a public issue.** Instead, report it privately so we can fix it before it's disclosed.
 
-**Email:** security@springdom.com
+**Email:** opening an issue at https://github.com/springdom/scrub-txt/issues
 
 Please include:
 - A description of the vulnerability

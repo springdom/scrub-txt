@@ -1,159 +1,140 @@
 # scrub.txt
 
-**Client-side data scrubber for safely using AI services.**
+**Stop leaking sensitive data to AI.**
 
-Paste your text → sensitive data gets replaced with realistic dummy values → copy into ChatGPT/Claude/any AI → paste the AI response back → get your real data restored.
+scrub.txt detects and replaces emails, API keys, private keys, phone numbers, and 50+ other sensitive data formats with realistic dummy values — then restores your originals in the AI's response. Everything runs in your browser. Nothing ever leaves.
 
-**Nothing ever leaves your browser.** Zero backend, zero tracking, zero data collection.
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![Patterns](https://img.shields.io/badge/patterns-55%2B-orange.svg)](#detection-patterns)
+[![Client-Side](https://img.shields.io/badge/network%20calls-zero-critical.svg)](#privacy)
 
-![MIT License](https://img.shields.io/badge/license-MIT-green)
+**[Try it live →](https://scrub-txt.vercel.app)**
 
 ---
 
-## Why?
+<!-- TODO: Add demo GIF here showing the full scrub → AI → rehydrate workflow -->
+<!-- ![scrub.txt demo](docs/demo.gif) -->
 
-Every time you paste text into an AI service, you risk exposing:
+## The Problem
 
-- Names, emails, phone numbers, addresses
-- API keys, tokens, connection strings
-- SSNs, credit card numbers, medical data
-- Internal project names, proprietary code
-- Anything else you wouldn't want in a training dataset
+Every day, millions of people paste sensitive data into AI services — emails, API keys, database credentials, internal project names, customer information. Once it's in the prompt, it's on someone else's server.
 
-**scrub.txt** catches this data automatically and replaces it with realistic fakes — so the AI gives you a useful response without ever seeing your real information.
+Enterprise DLP tools cost thousands and require IT to deploy. Most people have nothing.
 
-## How It Works
+## The Solution
 
-### 1. Scrub
-Paste your text. The tool auto-detects sensitive data using pattern matching and replaces it with type-appropriate dummy values:
+1. **Scrub** — Paste your text. Sensitive data is automatically detected and replaced with realistic fakes.
+2. **Use AI** — Copy the scrubbed text into ChatGPT, Claude, Gemini, or any AI service. It works normally because the fake data looks real.
+3. **Rehydrate** — Paste the AI's response back. All dummy values are swapped back to your originals.
 
-| Real Data | Replaced With |
-|-----------|---------------|
-| `matt@acme.com` | `user1@example.com` |
-| `(415) 555-1234` | `(555) 000-0001` |
-| `234-56-7890` | `000-00-0001` |
-| `sk-proj-abc123...` | `sk-dummy-key-000...0001` |
-| `192.168.1.42` | `10.0.0.1` |
-| `postgres://admin:s3cret@...` | `postgres://user:pass@localhost:5432/dummy_db_1` |
+You get a fully personalized AI response. The AI never saw your real data.
 
-### 2. Use AI
-Copy the scrubbed text and paste it into any AI service. The AI processes your request using the dummy values.
+## Why Realistic Fakes?
 
-### 3. Rehydrate
-Paste the AI's response into the Rehydrate panel. All dummy values get swapped back to your originals. You get a fully personalized response — but the AI never saw your real data.
+Most scrubbing tools replace data with tags like `[EMAIL_1]` or `[REDACTED]`. This breaks the AI's ability to reason about the text naturally. scrub.txt uses realistic dummy values instead:
 
-## Custom Rules
+| Real Data | scrub.txt | Other Tools |
+|-----------|-----------|-------------|
+| `matt@acme.com` | `user1@example.com` | `[EMAIL_1]` |
+| `(555) 867-5309` | `(555) 000-0001` | `[PHONE_REDACTED]` |
+| `sk-proj-abc123...` | `sk-dummy-key-000...` | `[API_KEY]` |
+| `Acme Corp` | `Apex Industries` | `[COMPANY_1]` |
+| `Project Falcon` | `Project Alpha` | `[PROJECT_1]` |
 
-The auto-detection catches structured patterns (emails, phones, keys, etc.), but it can't know your name is "Matt" or your project is called "Falcon."
+The AI reads `user1@example.com` as a normal email and responds naturally. Tags like `[EMAIL_1]` get flagged, questioned, or produce awkward output.
 
-Click **⚙ Rules** to add custom words and phrases. These get replaced with realistic fake names:
+## Detection Patterns
 
-- `Matt` → `James`
-- `Matt Johnson` → `James Smith`
-- `Project Falcon` → `David`
-- `Acme Corp` → `Maria`
+55+ built-in patterns across 5 categories, all toggleable:
 
-Custom rules support case-sensitive matching and word-boundary detection.
+**Personal Info** — Emails, US/international phones, SSNs, dates of birth, passport numbers
 
-## Auto-Detection
+**Financial** — Credit card numbers
 
-Built-in pattern detection for:
+**Keys & Secrets** — AWS, GCP, GitHub, Stripe, Slack, Discord, OpenAI, Anthropic, WireGuard, PGP/GPG, SSH, PEM private/public keys, certificates, Age encryption, Hashicorp Vault, Cloudflare, DigitalOcean, Doppler, Kubernetes, Docker, Terraform, Twilio, SendGrid, Mailgun, Firebase, NPM, PyPI, Vercel, Supabase, Shopify, Azure, Datadog
 
-**Personal Info:** Emails, US/international phone numbers, SSNs, dates of birth, passport numbers
+**Auth & Config** — JWTs, Bearer tokens, Basic Auth, auth URLs, connection strings, environment variables, password assignments, generic secrets, high-entropy strings
 
-**Financial:** Credit card numbers (with basic validation)
+**Network** — IPv4, IPv6, MAC addresses
 
-**Auth & Secrets:** API keys, AWS access keys, JWT tokens, URLs with auth parameters, database connection strings, private keys (PEM), environment variables with secrets
+**Custom Rules** — Add your own words and phrases with type-aware replacements: names → fake names, companies → fake companies, projects → fake codenames, locations → fake addresses
 
-**Network:** IPv4/IPv6 addresses, MAC addresses
+## Privacy
 
-Each pattern can be toggled on/off individually.
+scrub.txt is 100% client-side. This isn't a marketing claim — it's a verifiable architectural guarantee.
 
-## Getting Started
+- **Zero network calls** after page load. Open your browser's Network tab and check.
+- **Zero storage.** No localStorage, cookies, or IndexedDB. Close the tab and everything is gone.
+- **Zero dependencies in the engine.** The core scrubbing logic has no imports beyond itself.
+- **Zero analytics.** No tracking, no telemetry, no pixels.
+- **Works offline.** Install as a PWA, turn off WiFi, it still works.
+- **Open source.** Read every line of code yourself.
+
+See [SECURITY.md](SECURITY.md) for verification steps and our security policy.
+
+## Quick Start
 
 ```bash
-# Clone
-git clone https://github.com/YOUR_USERNAME/scrub-txt.git
+git clone https://github.com/springdom/scrub-txt.git
 cd scrub-txt
-
-# Install
 npm install
-
-# Dev server
 npm run dev
-
-# Build for production
-npm run build
 ```
 
-The production build outputs to `dist/` — deploy anywhere that serves static files.
+Opens at `http://localhost:5173`.
 
-### Deploy
+To build for production:
 
-**Vercel** (recommended):
-```bash
-npm i -g vercel
-vercel
-```
-
-**Netlify:**
 ```bash
 npm run build
-# drag dist/ folder to netlify.com/drop
 ```
 
-**GitHub Pages:**
-Add `base: '/scrub-txt/'` to `vite.config.js` and deploy the `dist/` folder.
+Output in `dist/` — a static site you can host anywhere.
 
 ## Architecture
 
 ```
 src/
-├── App.jsx              # Main UI component
+├── App.jsx              # Entire UI (single component)
 ├── main.jsx             # React entry point
 ├── index.css            # Global styles
 └── lib/
-    ├── patterns.js      # Detection regex patterns + metadata
-    ├── generators.js    # Dummy data generators per type
-    ├── engine.js        # Core scrub() and rehydrate() functions
+    ├── patterns.js      # 55+ detection patterns
+    ├── generators.js    # Fake data factories per type
+    ├── engine.js        # scrub() + rehydrate() pure functions
     └── colors.js        # Tag color assignments
 ```
 
-The engine is framework-agnostic — `scrub()` and `rehydrate()` are pure functions that take strings and return strings. You can use them in a CLI tool, browser extension, or any other context.
+The engine is framework-agnostic — `scrub()` and `rehydrate()` are pure functions that take strings in and return strings out. Same core logic can power a CLI, browser extension, or VS Code plugin.
 
-## Installable (PWA)
-
-scrub.txt ships as a Progressive Web App. Visit the deployed site and click "Install" in your browser to use it offline as a standalone app.
-
-## Roadmap
-
-- [ ] **Browser extension** — intercept paste events directly in ChatGPT/Claude/etc.
-- [ ] **Name dictionary** — auto-detect common first/last names without custom rules
-- [ ] **Address detection** — heuristic patterns for US/international addresses
-- [ ] **Local NER model** — run Named Entity Recognition in-browser via ONNX/Transformers.js
-- [ ] **Bulk custom rules** — paste a list of terms to add all at once
-- [ ] **Export/import rulesets** — share scrubbing profiles as JSON
-- [ ] **Confidence indicators** — show why each item was flagged
-- [ ] **File scrubbing** — drag & drop documents, not just text
-- [ ] **Community pattern library** — user-contributed detection patterns
+**Stack:** React + Vite. Two runtime dependencies (react, react-dom). PWA via vite-plugin-pwa. ~55KB gzipped.
 
 ## Contributing
 
-Contributions welcome! The easiest way to contribute:
+Contributions are welcome! The easiest way to help is adding new detection patterns. See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 
-1. **Add detection patterns** — edit `src/lib/patterns.js` to add new regex patterns
-2. **Add generators** — edit `src/lib/generators.js` to add matching dummy data generators
-3. **Report false positives/negatives** — open an issue with example text
+```js
+// Adding a pattern is this simple:
+{
+  id: 'service_key',
+  label: 'Service Name Keys',
+  enabled: true,
+  regex: /your-regex-here/g,
+  tag: 'API_KEY',
+  group: 'Keys & Secrets',
+}
+```
 
-## Privacy
+## Roadmap
 
-This tool is designed around a single principle: **your data never leaves your browser.**
-
-- All processing happens client-side in JavaScript
-- No backend, no API calls, no analytics, no cookies
-- The PWA works fully offline
-- Source code is open for verification
+- [ ] Browser extension — scrub directly inside ChatGPT/Claude
+- [ ] Name dictionary — auto-detect common names without custom rules
+- [ ] File drop — drag in `.env` files, configs, logs
+- [ ] CLI tool — `cat config.yml | scrub`
+- [ ] VS Code extension — scrub before sharing code
+- [ ] Local NER model — in-browser named entity recognition via Transformers.js
 
 ## License
 
-MIT — use it however you want.
+[MIT](LICENSE) — use it for anything.
