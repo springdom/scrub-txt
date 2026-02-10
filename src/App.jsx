@@ -35,7 +35,7 @@ const styles = {
   },
   settingsPanel: {
     borderBottom: '1px solid #18181b', padding: '14px 20px', background: '#0a0a0d',
-    maxHeight: 380, overflowY: 'auto', flexShrink: 0,
+    maxHeight: 500, overflowY: 'auto', flexShrink: 0,
   },
   sectionTitle: {
     fontSize: 10, fontWeight: 700, color: '#e44d26', marginBottom: 8,
@@ -382,8 +382,9 @@ export default function App() {
                 onChange={(e) => setRehydrateInput(e.target.value)}
                 placeholder="Paste AI response here..."
                 style={{
-                  ...styles.textarea, flex: 'none', minHeight: 70, background: '#0e0e11',
+                  ...styles.textarea, flex: 'none', minHeight: 150, background: '#0e0e11',
                   border: '1px solid #1e1e22', borderRadius: 5, padding: 10, boxSizing: 'border-box',
+                  resize: 'vertical', maxHeight: 400,
                 }}
               />
               {rehydratedText && rehydrateInput && (
@@ -403,7 +404,7 @@ export default function App() {
                   <div style={{
                     background: '#0e0e11', border: '1px solid #1e1e22', borderRadius: 5,
                     padding: 10, fontSize: 11.5, color: '#d4d4d8', whiteSpace: 'pre-wrap',
-                    maxHeight: 160, overflowY: 'auto', lineHeight: 1.6,
+                    maxHeight: 300, overflowY: 'auto', lineHeight: 1.6,
                   }}>
                     {rehydratedText}
                   </div>
