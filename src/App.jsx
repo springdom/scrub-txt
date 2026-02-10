@@ -103,6 +103,7 @@ export default function App() {
   const [copied, setCopied] = useState(false);
   const [rehydratedCopied, setRehydratedCopied] = useState(false);
   const [rehydrateInput, setRehydrateInput] = useState('');
+  const [showAbout, setShowAbout] = useState(false);
 
   const togglePattern = useCallback((id) => {
     setPatterns((prev) => prev.map((p) => (p.id === id ? { ...p, enabled: !p.enabled } : p)));
@@ -190,13 +191,19 @@ export default function App() {
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
           <button
-            onClick={() => { setShowMapping(!showMapping); setShowSettings(false); }}
+            onClick={() => { setShowAbout(!showAbout); setShowMapping(false); setShowSettings(false); }}
+            style={headerBtn(showAbout)}
+          >
+            ⓘ About
+          </button>
+          <button
+            onClick={() => { setShowMapping(!showMapping); setShowSettings(false); setShowAbout(false); }}
             style={headerBtn(showMapping)}
           >
             ↩ Rehydrate{mapping.length > 0 ? ` (${mapping.length})` : ''}
           </button>
           <button
-            onClick={() => { setShowSettings(!showSettings); setShowMapping(false); }}
+            onClick={() => { setShowSettings(!showSettings); setShowMapping(false); setShowAbout(false); }}
             style={headerBtn(showSettings)}
           >
             ⚙ Rules ({enabledCount + customRules.length})
@@ -345,6 +352,59 @@ export default function App() {
               )}
             </>
           )}
+        </div>
+      )}
+
+      {/* ── About Panel ── */}
+      {showAbout && (
+        <div style={styles.settingsPanel}>
+          <div style={styles.sectionTitle}>About</div>
+          <div style={{ fontSize: 12, color: '#a1a1aa', lineHeight: 1.7, marginBottom: 16 }}>
+            <strong style={{ color: '#fafafa' }}>scrub.txt</strong> is a client-side data scrubber
+            for safely using AI services. Paste your text, sensitive data gets replaced with
+            realistic dummy values, copy it into any AI, then rehydrate the response with your
+            real data. Nothing ever leaves your browser.
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 10, color: '#3f3f46', textTransform: 'uppercase', letterSpacing: '0.1em', width: 60, flexShrink: 0 }}>Version</span>
+              <span style={{ fontSize: 11.5, color: '#d4d4d8' }}>0.1.0</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 10, color: '#3f3f46', textTransform: 'uppercase', letterSpacing: '0.1em', width: 60, flexShrink: 0 }}>License</span>
+              <span style={{ fontSize: 11.5, color: '#d4d4d8' }}>MIT</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 10, color: '#3f3f46', textTransform: 'uppercase', letterSpacing: '0.1em', width: 60, flexShrink: 0 }}>Source</span>
+              <a
+                href="https://github.com/springdom/scrub-txt"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ fontSize: 11.5, color: '#e44d26', textDecoration: 'none' }}
+              >
+                github.com/springdom/scrub-txt
+              </a>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 10, color: '#3f3f46', textTransform: 'uppercase', letterSpacing: '0.1em', width: 60, flexShrink: 0 }}>Built by</span>
+              <a
+                href="https://github.com/springdom"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ fontSize: 11.5, color: '#e44d26', textDecoration: 'none' }}
+              >
+                Springdom
+              </a>
+            </div>
+          </div>
+
+          <div style={{
+            marginTop: 16, paddingTop: 12, borderTop: '1px solid #1e1e22',
+            fontSize: 10.5, color: '#3f3f46', lineHeight: 1.6,
+          }}>
+            100% open source · Zero tracking · No backend · No cookies · Works offline
+          </div>
         </div>
       )}
 
