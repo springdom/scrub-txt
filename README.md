@@ -9,7 +9,7 @@ scrub.txt detects and replaces emails, API keys, private keys, phone numbers, an
 [![Patterns](https://img.shields.io/badge/patterns-55%2B-orange.svg)](#detection-patterns)
 [![Client-Side](https://img.shields.io/badge/network%20calls-zero-critical.svg)](#privacy)
 
-**[Try it live →](https://scrub-txt.vercel.app)**
+**[Try it live →](https://scrubtxt.com)**
 
 ---
 
