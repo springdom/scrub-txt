@@ -8,18 +8,6 @@
  *   - Resets between scrub runs for deterministic output
  */
 
-const FAKE_FIRST = [
-  'James', 'Maria', 'David', 'Sarah', 'Michael', 'Emma', 'Robert', 'Lisa',
-  'Daniel', 'Anna', 'Thomas', 'Laura', 'William', 'Jennifer', 'Richard', 'Emily',
-  'Joseph', 'Rachel', 'Charles', 'Karen',
-];
-
-const FAKE_LAST = [
-  'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis',
-  'Martinez', 'Wilson', 'Anderson', 'Taylor', 'Thomas', 'Moore', 'Jackson', 'Martin',
-  'Lee', 'Thompson', 'White', 'Harris',
-];
-
 const EMAIL_DOMAINS = ['example.com', 'sample.org', 'test.net', 'demo.io', 'placeholder.dev'];
 const TEST_CARDS = ['4111 1111 1111 1111', '4242 4242 4242 4242', '5500 0000 0000 0004', '3782 822463 10005'];
 const DB_TYPES = ['postgres', 'mongodb', 'mysql', 'redis'];
@@ -265,48 +253,24 @@ export function createGenerators() {
       return `DummyHighEntropyString${'0'.repeat(20)}${pad(i)}`;
     },
 
-    CUSTOM_PERSON: (original) => {
+    CUSTOM_PERSON: () => {
       const i = c('CUSTOM_PERSON');
-      const first = FAKE_FIRST[(i - 1) % FAKE_FIRST.length];
-      const last = FAKE_LAST[(i - 1) % FAKE_LAST.length];
-      if (!original.includes(' ')) return first;
-      return `${first} ${last}`;
+      return `Person_${i}`;
     },
 
     CUSTOM_ORG: () => {
       const i = c('CUSTOM_ORG');
-      const names = [
-        'Apex Industries', 'Nova Systems', 'Redwood Labs', 'Pinnacle Group',
-        'Summit Technologies', 'Ironbridge Corp', 'Helix Solutions', 'Cobalt Dynamics',
-        'Meridian Partners', 'Crestline Ventures', 'Whitestone Inc', 'Evergreen Holdings',
-        'Atlas Enterprises', 'Keystone Digital', 'Northstar Global', 'Silverleaf Corp',
-        'Horizon Networks', 'Beacon Analytics', 'Ridgeline Software', 'Granite Works',
-      ];
-      return names[(i - 1) % names.length];
+      return `Company_${i}`;
     },
 
     CUSTOM_PROJECT: () => {
       const i = c('CUSTOM_PROJECT');
-      const names = [
-        'Project Alpha', 'Project Horizon', 'Operation Keystone', 'Initiative Apex',
-        'Project Meridian', 'Operation Lighthouse', 'Project Silverline', 'Initiative Redwood',
-        'Project Nightfall', 'Operation Compass', 'Project Ironbridge', 'Initiative Summit',
-        'Project Evergreen', 'Operation Trident', 'Project Cobalt', 'Initiative Atlas',
-        'Project Vanguard', 'Operation Starlight', 'Project Granite', 'Initiative Beacon',
-      ];
-      return names[(i - 1) % names.length];
+      return `Project_${i}`;
     },
 
     CUSTOM_LOCATION: () => {
       const i = c('CUSTOM_LOCATION');
-      const locations = [
-        '123 Oak Street, Springfield', '456 Maple Avenue, Riverside',
-        '789 Pine Road, Lakewood', '321 Elm Drive, Fairview',
-        '654 Cedar Lane, Greenville', '987 Birch Court, Hillcrest',
-        '147 Walnut Way, Brookfield', '258 Aspen Circle, Clearwater',
-        '369 Willow Path, Stonebridge', '741 Cypress Boulevard, Westbrook',
-      ];
-      return locations[(i - 1) % locations.length];
+      return `Location_${i}`;
     },
 
     CUSTOM_OTHER: () => {
@@ -314,12 +278,10 @@ export function createGenerators() {
       return `REDACTED_${i}`;
     },
 
-    CUSTOM: (original) => {
+    // Legacy fallback
+    CUSTOM: () => {
       const i = c('CUSTOM');
-      const first = FAKE_FIRST[(i - 1) % FAKE_FIRST.length];
-      const last = FAKE_LAST[(i - 1) % FAKE_LAST.length];
-      if (!original.includes(' ')) return first;
-      return `${first} ${last}`;
+      return `REDACTED_${i}`;
     },
   };
 }
