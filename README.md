@@ -13,8 +13,7 @@ scrub.txt detects and replaces emails, API keys, private keys, phone numbers, an
 
 ---
 
-<!-- TODO: Add demo GIF here showing the full scrub → AI → rehydrate workflow -->
-<!-- ![scrub.txt demo](docs/demo.gif) -->
+![scrub.txt — paste text, get scrubbed output with color-coded replacements](docs/screenshot-scrub.png)
 
 ## The Problem
 
@@ -30,6 +29,8 @@ Enterprise DLP tools cost thousands and require IT to deploy. Most people have n
 
 You get a fully personalized AI response. The AI never saw your real data.
 
+![Rehydrate — AI response with dummy values restored to originals](docs/screenshot-rehydrate.png)
+
 ## Why Realistic Fakes?
 
 Most scrubbing tools replace data with tags like `[EMAIL_1]` or `[REDACTED]`. This breaks the AI's ability to reason about the text naturally. scrub.txt uses realistic dummy values instead:
@@ -39,10 +40,26 @@ Most scrubbing tools replace data with tags like `[EMAIL_1]` or `[REDACTED]`. Th
 | `matt@acme.com` | `user1@example.com` | `[EMAIL_1]` |
 | `(555) 867-5309` | `(555) 000-0001` | `[PHONE_REDACTED]` |
 | `sk-proj-abc123...` | `sk-dummy-key-000...` | `[API_KEY]` |
-| `Acme Corp` | `Apex Industries` | `[COMPANY_1]` |
-| `Project Falcon` | `Project Alpha` | `[PROJECT_1]` |
+| `Acme Corp` | `Company_1` | `[COMPANY_1]` |
+| `Project Falcon` | `Project_1` | `[PROJECT_1]` |
 
 The AI reads `user1@example.com` as a normal email and responds naturally. Tags like `[EMAIL_1]` get flagged, questioned, or produce awkward output.
+
+## Custom Rules
+
+Auto-detection catches structured patterns (emails, keys, IPs), but can't know that "Sarah" is your coworker or "Falcon" is your project name.
+
+Add custom words and phrases with type-aware replacements:
+
+| Type | Example | Replaced With |
+|------|---------|---------------|
+| 👤 Person | `Sarah`, `Matt Johnson` | `Person_1`, `Person_2` |
+| 🏢 Company | `Acme Corp` | `Company_1` |
+| 📁 Project | `Project Falcon` | `Project_1` |
+| 📍 Location | `123 Main St` | `Location_1` |
+| 🏷️ Other | `Confidential` | `REDACTED_1` |
+
+![Rules panel — custom words, pattern toggles, type-aware replacements](docs/screenshot-rules.png)
 
 ## Detection Patterns
 
@@ -54,11 +71,9 @@ The AI reads `user1@example.com` as a normal email and responds naturally. Tags 
 
 **Keys & Secrets** — AWS, GCP, GitHub, Stripe, Slack, Discord, OpenAI, Anthropic, WireGuard, PGP/GPG, SSH, PEM private/public keys, certificates, Age encryption, Hashicorp Vault, Cloudflare, DigitalOcean, Doppler, Kubernetes, Docker, Terraform, Twilio, SendGrid, Mailgun, Firebase, NPM, PyPI, Vercel, Supabase, Shopify, Azure, Datadog
 
-**Auth & Config** — JWTs, Bearer tokens, Basic Auth, auth URLs, connection strings, environment variables, password assignments, generic secrets, high-entropy strings
+**Auth & Config** — JWTs, Bearer tokens, Basic Auth, auth URLs, connection strings, environment variables, password assignments, generic secrets
 
 **Network** — IPv4, IPv6, MAC addresses
-
-**Custom Rules** — Add your own words and phrases with type-aware replacements: names → fake names, companies → fake companies, projects → fake codenames, locations → fake addresses
 
 ## Privacy
 
