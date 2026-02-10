@@ -130,6 +130,46 @@ export function createGenerators() {
       return `ssh-ed25519 AAAA${'C3NzaC1lZDI1NTE5AAAAI'.padEnd(44, 'A')}dummy${pad(i)} user@dummy-host`;
     },
 
+    WG_KEY: (original) => {
+      const i = c('WG_KEY');
+      const prefix = original.match(/^(PrivateKey|PublicKey|PresharedKey)\s*=\s*/);
+      const label = prefix ? prefix[0] : 'PrivateKey = ';
+      return `${label}${'A'.repeat(39)}dummy${pad(i, 1)}=`;
+    },
+
+    WG_ENDPOINT: () => {
+      const i = c('WG_ENDPOINT');
+      return `Endpoint = 10.0.0.${i}:51820`;
+    },
+
+    PGP_MSG: () => {
+      return '-----BEGIN PGP MESSAGE-----\nDUMMY_PGP_MESSAGE_PLACEHOLDER\n-----END PGP MESSAGE-----';
+    },
+
+    AGE_KEY: () => {
+      const i = c('AGE_KEY');
+      return `AGE-SECRET-KEY-1${'DUMMYKEYDUMMYKEYDUMMYKEYDUMMYKEYDUMMYKEYDUMMYKEYDUM'.slice(0, 54)}${pad(i, 4)}`;
+    },
+
+    VAULT_TOKEN: () => {
+      const i = c('VAULT_TOKEN');
+      return `hvs.${'0'.repeat(22)}${pad(i, 2)}`;
+    },
+
+    K8S_SECRET: (original) => {
+      const i = c('K8S_SECRET');
+      const prefix = original.match(/^[\w-]+:\s*/);
+      if (prefix) {
+        return `${prefix[0]}${'RHVtbXlLOHNTZWNyZXQ'.padEnd(44, '=')}${pad(i)}`;
+      }
+      return `token: dummy-k8s-token-${'0'.repeat(30)}${pad(i)}`;
+    },
+
+    DOCKER_AUTH: () => {
+      const i = c('DOCKER_AUTH');
+      return `"auth": "${btoa(`dummy_user_${i}:dummy_pass_${i}`)}"`;
+    },
+
     AWS_SECRET: () => {
       const i = c('AWS_SECRET');
       return `aws_secret_access_key=${'A'.repeat(36)}${pad(i)}`;

@@ -104,6 +104,7 @@ export default function App() {
   const [rehydratedCopied, setRehydratedCopied] = useState(false);
   const [rehydrateInput, setRehydrateInput] = useState('');
   const [showAbout, setShowAbout] = useState(false);
+  const [showHowTo, setShowHowTo] = useState(false);
 
   const togglePattern = useCallback((id) => {
     setPatterns((prev) => prev.map((p) => (p.id === id ? { ...p, enabled: !p.enabled } : p)));
@@ -191,19 +192,25 @@ export default function App() {
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
           <button
-            onClick={() => { setShowAbout(!showAbout); setShowMapping(false); setShowSettings(false); }}
+            onClick={() => { setShowHowTo(!showHowTo); setShowAbout(false); setShowMapping(false); setShowSettings(false); }}
+            style={headerBtn(showHowTo)}
+          >
+            ? How to Use
+          </button>
+          <button
+            onClick={() => { setShowAbout(!showAbout); setShowMapping(false); setShowSettings(false); setShowHowTo(false); }}
             style={headerBtn(showAbout)}
           >
             ⓘ About
           </button>
           <button
-            onClick={() => { setShowMapping(!showMapping); setShowSettings(false); setShowAbout(false); }}
+            onClick={() => { setShowMapping(!showMapping); setShowSettings(false); setShowAbout(false); setShowHowTo(false); }}
             style={headerBtn(showMapping)}
           >
             ↩ Rehydrate{mapping.length > 0 ? ` (${mapping.length})` : ''}
           </button>
           <button
-            onClick={() => { setShowSettings(!showSettings); setShowMapping(false); setShowAbout(false); }}
+            onClick={() => { setShowSettings(!showSettings); setShowMapping(false); setShowAbout(false); setShowHowTo(false); }}
             style={headerBtn(showSettings)}
           >
             ⚙ Rules ({enabledCount + customRules.length})
@@ -352,6 +359,85 @@ export default function App() {
               )}
             </>
           )}
+        </div>
+      )}
+
+      {/* ── How to Use Panel ── */}
+      {showHowTo && (
+        <div style={styles.settingsPanel}>
+          <div style={styles.sectionTitle}>How to Use</div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* Step 1 */}
+            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+              <div style={{
+                width: 24, height: 24, borderRadius: 12, background: '#e44d26',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 12, fontWeight: 700, color: '#fff', flexShrink: 0,
+              }}>1</div>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#fafafa', marginBottom: 3 }}>Scrub</div>
+                <div style={{ fontSize: 11, color: '#71717a', lineHeight: 1.6 }}>
+                  Paste your text in the left panel. Sensitive data like emails, API keys, phone numbers,
+                  and private keys are automatically detected and replaced with realistic dummy values.
+                </div>
+              </div>
+            </div>
+
+            {/* Step 2 */}
+            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+              <div style={{
+                width: 24, height: 24, borderRadius: 12, background: '#e44d26',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 12, fontWeight: 700, color: '#fff', flexShrink: 0,
+              }}>2</div>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#fafafa', marginBottom: 3 }}>Copy & Use AI</div>
+                <div style={{ fontSize: 11, color: '#71717a', lineHeight: 1.6 }}>
+                  Hit <span style={{ color: '#e44d26' }}>Copy</span> on the scrubbed output and paste it into
+                  ChatGPT, Claude, or any AI service. The AI processes your request using fake data —
+                  your real data never touches their servers.
+                </div>
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+              <div style={{
+                width: 24, height: 24, borderRadius: 12, background: '#e44d26',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 12, fontWeight: 700, color: '#fff', flexShrink: 0,
+              }}>3</div>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#fafafa', marginBottom: 3 }}>Rehydrate</div>
+                <div style={{ fontSize: 11, color: '#71717a', lineHeight: 1.6 }}>
+                  Click <span style={{ color: '#e44d26' }}>↩ Rehydrate</span> and paste the AI's response.
+                  All dummy values get swapped back to your originals. You get a fully personalized
+                  response without the AI ever seeing your real data.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style={{
+            marginTop: 16, paddingTop: 12, borderTop: '1px solid #1e1e22',
+          }}>
+            <div style={{ ...styles.sectionTitle, marginTop: 4 }}>Tips</div>
+            <div style={{ fontSize: 11, color: '#71717a', lineHeight: 1.7 }}>
+              <div style={{ marginBottom: 6 }}>
+                <span style={{ color: '#a1a1aa' }}>Custom rules</span> — Click ⚙ Rules to add names,
+                company names, or project codenames. These get replaced with realistic fake names.
+              </div>
+              <div style={{ marginBottom: 6 }}>
+                <span style={{ color: '#a1a1aa' }}>Toggle patterns</span> — Not everything needs scrubbing.
+                Disable patterns you don't need to reduce false positives.
+              </div>
+              <div>
+                <span style={{ color: '#a1a1aa' }}>Same in, same out</span> — If the same email appears
+                5 times, it maps to the same fake email every time, keeping the text coherent.
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

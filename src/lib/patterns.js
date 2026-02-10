@@ -126,6 +126,138 @@ export const PATTERNS = [
     group: 'Keys & Secrets',
   },
 
+  // -- WireGuard --
+  {
+    id: 'wireguard_key',
+    label: 'WireGuard Keys',
+    enabled: true,
+    regex: /(?:PrivateKey|PublicKey|PresharedKey)\s*=\s*[A-Za-z0-9+\/]{42,44}={0,2}/g,
+    tag: 'WG_KEY',
+    group: 'Keys & Secrets',
+  },
+  {
+    id: 'wireguard_config',
+    label: 'WireGuard Endpoints',
+    enabled: true,
+    regex: /Endpoint\s*=\s*[^\s]+:\d+/g,
+    tag: 'WG_ENDPOINT',
+    group: 'Keys & Secrets',
+  },
+
+  // -- PGP / GPG --
+  {
+    id: 'pgp_private',
+    label: 'PGP Private Keys',
+    enabled: true,
+    regex: /-----BEGIN PGP PRIVATE KEY BLOCK-----[\s\S]*?-----END PGP PRIVATE KEY BLOCK-----/g,
+    tag: 'PRIVATE_KEY',
+    group: 'Keys & Secrets',
+  },
+  {
+    id: 'pgp_public',
+    label: 'PGP Public Keys',
+    enabled: true,
+    regex: /-----BEGIN PGP PUBLIC KEY BLOCK-----[\s\S]*?-----END PGP PUBLIC KEY BLOCK-----/g,
+    tag: 'PUBLIC_KEY',
+    group: 'Keys & Secrets',
+  },
+  {
+    id: 'pgp_message',
+    label: 'PGP Messages',
+    enabled: true,
+    regex: /-----BEGIN PGP MESSAGE-----[\s\S]*?-----END PGP MESSAGE-----/g,
+    tag: 'PGP_MSG',
+    group: 'Keys & Secrets',
+  },
+
+  // -- Age Encryption --
+  {
+    id: 'age_secret_key',
+    label: 'Age Secret Keys',
+    enabled: true,
+    regex: /AGE-SECRET-KEY-1[A-Z0-9]{58}/g,
+    tag: 'AGE_KEY',
+    group: 'Keys & Secrets',
+  },
+
+  // -- Hashicorp Vault --
+  {
+    id: 'vault_token',
+    label: 'Vault Tokens',
+    enabled: true,
+    regex: /hv[sb]\.[A-Za-z0-9]{24,}/g,
+    tag: 'VAULT_TOKEN',
+    group: 'Keys & Secrets',
+  },
+
+  // -- Cloudflare --
+  {
+    id: 'cloudflare_token',
+    label: 'Cloudflare Tokens',
+    enabled: true,
+    regex: /(?:cf_|v1\.0-)[A-Za-z0-9\-_]{30,}/g,
+    tag: 'API_KEY',
+    group: 'Keys & Secrets',
+  },
+
+  // -- DigitalOcean --
+  {
+    id: 'digitalocean_token',
+    label: 'DigitalOcean Tokens',
+    enabled: true,
+    regex: /dop_v1_[a-f0-9]{64}/g,
+    tag: 'API_KEY',
+    group: 'Keys & Secrets',
+  },
+
+  // -- Doppler --
+  {
+    id: 'doppler_token',
+    label: 'Doppler Tokens',
+    enabled: true,
+    regex: /dp\.(?:st|sa|ct)\.[A-Za-z0-9_\-]{40,}/g,
+    tag: 'API_KEY',
+    group: 'Keys & Secrets',
+  },
+
+  // -- Kubernetes --
+  {
+    id: 'k8s_cert_data',
+    label: 'K8s Certificate Data',
+    enabled: true,
+    regex: /(?:certificate-authority-data|client-certificate-data|client-key-data):\s*[A-Za-z0-9+\/=]{40,}/g,
+    tag: 'K8S_SECRET',
+    group: 'Keys & Secrets',
+  },
+  {
+    id: 'k8s_token',
+    label: 'K8s Tokens',
+    enabled: true,
+    regex: /(?:token:\s*)[A-Za-z0-9\-_.]{50,}/g,
+    tag: 'K8S_SECRET',
+    group: 'Keys & Secrets',
+  },
+
+  // -- Docker Registry Auth --
+  {
+    id: 'docker_auth',
+    label: 'Docker Auth',
+    enabled: true,
+    regex: /"auth":\s*"[A-Za-z0-9+\/=]{20,}"/g,
+    tag: 'DOCKER_AUTH',
+    group: 'Keys & Secrets',
+  },
+
+  // -- Terraform --
+  {
+    id: 'terraform_token',
+    label: 'Terraform Tokens',
+    enabled: true,
+    regex: /(?:credentials\s+"[^"]+"\s*\{\s*token\s*=\s*"[^"]+"|TFE_TOKEN|ATLAS_TOKEN)[\s=]*[A-Za-z0-9\.\-_]{14,}/g,
+    tag: 'API_KEY',
+    group: 'Keys & Secrets',
+  },
+
   // -- AWS --
   {
     id: 'aws_access_key',
