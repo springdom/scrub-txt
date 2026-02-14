@@ -1,3 +1,10 @@
+:root {
+  --scroll-thumb: #333;
+  --scroll-thumb-hover: #444;
+  --placeholder-textarea: #404040;
+  --placeholder-input: #505050;
+}
+
 *,
 *::before,
 *::after {
@@ -13,8 +20,8 @@ html, body, #root {
 }
 
 body {
-  background: #08080a;
-  color: #d4d4d8;
+  background: #0a0a0a;
+  color: #e0e0e0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -25,11 +32,11 @@ body {
 }
 
 textarea::placeholder {
-  color: #27272a;
+  color: var(--placeholder-textarea);
 }
 
 input::placeholder {
-  color: #3f3f46;
+  color: var(--placeholder-input);
 }
 
 ::-webkit-scrollbar {
@@ -42,10 +49,10 @@ input::placeholder {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: var(--scroll-thumb);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: var(--scroll-thumb-hover);
 }

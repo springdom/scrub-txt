@@ -1,19 +1,51 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { PATTERNS, getGroups } from './lib/patterns.js';
 import { TAG_COLORS } from './lib/colors.js';
 import { scrub, rehydrate } from './lib/engine.js';
 
+/* ── Theme ── */
+const themes = {
+  dark: {
+    bg: '#0a0a0a', bgPanel: '#0e0e0e', bgInput: '#141414',
+    text: '#e0e0e0', textBright: '#f0f0f0', textBody: '#d0d0d0', textMuted: '#a0a0a0',
+    textDim: '#aaa', textFaint: '#666', textPlaceholder: '#333',
+    border: '#222', borderLight: '#1a1a1a', borderInput: '#2a2a2a', borderActive: '#333',
+    chipBg: '#141414', chipBorder: '#2a2a2a',
+    chipActiveBg: '#0d1f0d', chipActiveBorder: '#1a3a1a',
+    customChipBg: '#1a1a1a', customChipBorder: '#333',
+    headerBtnActiveBg: '#1a1a1a',
+    errorBg: '#1a0a0a', errorBorder: '#331515',
+    selectionBg: '#e44d2640',
+    scrollThumb: '#333', scrollThumbHover: '#444',
+    placeholderTextarea: '#404040', placeholderInput: '#505050',
+  },
+  light: {
+    bg: '#f5f5f5', bgPanel: '#eaeaea', bgInput: '#fff',
+    text: '#1a1a1a', textBright: '#000', textBody: '#555', textMuted: '#888',
+    textDim: '#666', textFaint: '#aaa', textPlaceholder: '#ccc',
+    border: '#ddd', borderLight: '#e0e0e0', borderInput: '#ccc', borderActive: '#bbb',
+    chipBg: '#fff', chipBorder: '#ccc',
+    chipActiveBg: '#e6f4e6', chipActiveBorder: '#8bc78b',
+    customChipBg: '#e8e8e8', customChipBorder: '#ccc',
+    headerBtnActiveBg: '#e0e0e0',
+    errorBg: '#fef2f2', errorBorder: '#f5c6c6',
+    selectionBg: '#e44d2640',
+    scrollThumb: '#c0c0c0', scrollThumbHover: '#a0a0a0',
+    placeholderTextarea: '#bbb', placeholderInput: '#999',
+  },
+};
+
 /* ── Styles ── */
 const font = "'IBM Plex Mono', 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace";
 
-const styles = {
+const getStyles = (t) => ({
   root: {
-    height: '100vh', background: '#08080a', color: '#d4d4d8',
+    height: '100vh', background: t.bg, color: t.text,
     fontFamily: font, display: 'flex', flexDirection: 'column', overflow: 'hidden',
   },
   header: {
     padding: '14px 20px', display: 'flex', alignItems: 'center',
-    justifyContent: 'space-between', borderBottom: '1px solid #18181b', flexShrink: 0,
+    justifyContent: 'space-between', borderBottom: `1px solid ${t.border}`, flexShrink: 0,
   },
   logoBox: {
     width: 28, height: 28, borderRadius: 6, background: '#e44d26',
@@ -21,20 +53,20 @@ const styles = {
     fontSize: 13, fontWeight: 800, color: '#fff', letterSpacing: '-0.05em',
   },
   panelHeader: {
-    padding: '8px 20px', borderBottom: '1px solid #111113',
+    padding: '8px 20px', borderBottom: `1px solid ${t.borderLight}`,
     display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0,
   },
   panelLabel: {
-    fontSize: 10, color: '#3f3f46', textTransform: 'uppercase',
+    fontSize: 10, color: t.textDim, textTransform: 'uppercase',
     letterSpacing: '0.1em', fontWeight: 600,
   },
   textarea: {
     flex: 1, background: 'transparent', border: 'none', padding: '14px 20px',
-    color: '#d4d4d8', fontSize: 12.5, fontFamily: font, resize: 'none',
+    color: t.text, fontSize: 12.5, fontFamily: font, resize: 'none',
     outline: 'none', lineHeight: 1.75, width: '100%', overflowY: 'auto',
   },
   settingsPanel: {
-    borderBottom: '1px solid #18181b', padding: '14px 20px', background: '#0a0a0d',
+    borderBottom: `1px solid ${t.border}`, padding: '14px 20px', background: t.bgPanel,
     maxHeight: 500, overflowY: 'auto', flexShrink: 0,
   },
   sectionTitle: {
@@ -42,19 +74,19 @@ const styles = {
     textTransform: 'uppercase', letterSpacing: '0.1em',
   },
   input: {
-    flex: 1, background: '#0e0e11', border: '1px solid #1e1e22', borderRadius: 5,
-    padding: '7px 10px', color: '#d4d4d8', fontSize: 11.5, outline: 'none', fontFamily: font,
+    flex: 1, background: t.bgInput, border: `1px solid ${t.borderInput}`, borderRadius: 5,
+    padding: '7px 10px', color: t.text, fontSize: 11.5, outline: 'none', fontFamily: font,
   },
   statsBar: {
-    padding: '6px 20px', background: '#0a0a0d', borderBottom: '1px solid #18181b',
+    padding: '6px 20px', background: t.bgPanel, borderBottom: `1px solid ${t.border}`,
     display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', flexShrink: 0,
   },
-};
+});
 
-const headerBtn = (active) => ({
-  background: active ? '#18181b' : 'transparent',
-  border: `1px solid ${active ? '#27272a' : '#18181b'}`,
-  color: active ? '#e44d26' : '#52525b',
+const headerBtn = (active, t) => ({
+  background: active ? t.headerBtnActiveBg : 'transparent',
+  border: `1px solid ${active ? t.borderActive : t.border}`,
+  color: active ? '#e44d26' : t.textDim,
   borderRadius: 5, padding: '5px 10px', fontSize: 11,
   cursor: 'pointer', fontFamily: font, transition: 'all 0.15s',
 });
@@ -65,15 +97,15 @@ const copyBtn = (active) => ({
   cursor: 'pointer', fontFamily: font, transition: 'all 0.15s', letterSpacing: '0.02em',
 });
 
-const smallBtn = {
-  background: 'transparent', border: '1px solid #18181b', color: '#52525b',
+const getSmallBtn = (t) => ({
+  background: 'transparent', border: `1px solid ${t.border}`, color: t.textDim,
   borderRadius: 4, padding: '2px 8px', fontSize: 10, cursor: 'pointer', fontFamily: font,
-};
+});
 
-const chip = (active) => ({
-  background: active ? '#132713' : '#111113',
-  border: `1px solid ${active ? '#1e3a1e' : '#1e1e22'}`,
-  color: active ? '#4ade80' : '#3f3f46',
+const chip = (active, t) => ({
+  background: active ? t.chipActiveBg : t.chipBg,
+  border: `1px solid ${active ? t.chipActiveBorder : t.chipBorder}`,
+  color: active ? (t === themes.light ? '#16a34a' : '#4ade80') : t.textMuted,
   borderRadius: 4, padding: '3px 9px', fontSize: 10.5,
   cursor: 'pointer', fontFamily: font, transition: 'all 0.15s',
 });
@@ -83,10 +115,10 @@ const tag = (color) => ({
   padding: '1px 5px', fontSize: 11.5, fontWeight: 500, border: `1px solid ${color}30`,
 });
 
-const customChip = {
-  background: '#18181b', border: '1px solid #27272a', borderRadius: 3,
+const getCustomChip = (t) => ({
+  background: t.customChipBg, border: `1px solid ${t.customChipBorder}`, borderRadius: 3,
   padding: '3px 7px', fontSize: 10.5, display: 'flex', alignItems: 'center', gap: 5,
-};
+});
 
 /* ── Placeholder text ── */
 const PLACEHOLDER = `Paste text here to scrub...\n\nTry:\nHey, it's Matt Johnson (matt.j@acme.com).\nCall me at (415) 555-1234.\nMy SSN is 234-56-7890.\nAPI key: sk-proj-abc123def456ghi789jklmnop\nServer: 192.168.1.42\nDB: postgres://admin:s3cret@prod-db.acme.com:5432/users`;
@@ -106,6 +138,26 @@ export default function App() {
   const [rehydrateInput, setRehydrateInput] = useState('');
   const [showAbout, setShowAbout] = useState(false);
   const [showHowTo, setShowHowTo] = useState(false);
+  const [dark, setDark] = useState(() => {
+    try { return localStorage.getItem('scrub-theme') !== 'light'; } catch { return true; }
+  });
+
+  const t = dark ? themes.dark : themes.light;
+  const styles = useMemo(() => getStyles(t), [dark]);
+  const smallBtn = useMemo(() => getSmallBtn(t), [dark]);
+  const customChip = useMemo(() => getCustomChip(t), [dark]);
+
+  useEffect(() => {
+    try { localStorage.setItem('scrub-theme', dark ? 'dark' : 'light'); } catch {}
+    document.body.style.background = t.bg;
+    document.body.style.color = t.text;
+    // Update CSS custom properties for scrollbar & placeholder
+    const root = document.documentElement;
+    root.style.setProperty('--scroll-thumb', t.scrollThumb);
+    root.style.setProperty('--scroll-thumb-hover', t.scrollThumbHover);
+    root.style.setProperty('--placeholder-textarea', t.placeholderTextarea);
+    root.style.setProperty('--placeholder-input', t.placeholderInput);
+  }, [dark, t]);
 
   const togglePattern = useCallback((id) => {
     setPatterns((prev) => prev.map((p) => (p.id === id ? { ...p, enabled: !p.enabled } : p)));
@@ -172,7 +224,7 @@ export default function App() {
 
   // Highlight fake values in output
   const renderScrubbed = () => {
-    if (!scrubbed) return <span style={{ color: '#1e1e22' }}>Scrubbed text appears here...</span>;
+    if (!scrubbed) return <span style={{ color: t.textPlaceholder }}>Scrubbed text appears here...</span>;
     if (mapping.length === 0) return <span>{scrubbed}</span>;
 
     const fakeValues = mapping.map((m) => m.fake).sort((a, b) => b.length - a.length);
@@ -197,10 +249,10 @@ export default function App() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={styles.logoBox}>S</div>
           <div>
-            <div style={{ fontSize: 13.5, fontWeight: 700, color: '#fafafa', letterSpacing: '-0.03em' }}>
-              scrub.txt
+            <div style={{ fontSize: 13.5, fontWeight: 700, color: t.text, letterSpacing: '-0.03em' }}>
+              scrubtxt
             </div>
-            <div style={{ fontSize: 10, color: '#3f3f46', marginTop: 1 }}>
+            <div style={{ fontSize: 10, color: t.textMuted, marginTop: 1 }}>
               100% client-side · nothing leaves your browser
             </div>
           </div>
@@ -208,27 +260,37 @@ export default function App() {
         <div style={{ display: 'flex', gap: 6 }}>
           <button
             onClick={() => { setShowHowTo(!showHowTo); setShowAbout(false); setShowMapping(false); setShowSettings(false); }}
-            style={headerBtn(showHowTo)}
+            style={headerBtn(showHowTo, t)}
           >
             ? How to Use
           </button>
           <button
             onClick={() => { setShowAbout(!showAbout); setShowMapping(false); setShowSettings(false); setShowHowTo(false); }}
-            style={headerBtn(showAbout)}
+            style={headerBtn(showAbout, t)}
           >
             ⓘ About
           </button>
           <button
             onClick={() => { setShowMapping(!showMapping); setShowSettings(false); setShowAbout(false); setShowHowTo(false); }}
-            style={headerBtn(showMapping)}
+            style={headerBtn(showMapping, t)}
           >
             ↩ Rehydrate{mapping.length > 0 ? ` (${mapping.length})` : ''}
           </button>
           <button
             onClick={() => { setShowSettings(!showSettings); setShowMapping(false); setShowAbout(false); setShowHowTo(false); }}
-            style={headerBtn(showSettings)}
+            style={headerBtn(showSettings, t)}
           >
             ⚙ Rules ({enabledCount + customRules.length})
+          </button>
+          <button
+            onClick={() => setDark(!dark)}
+            style={{
+              ...headerBtn(false, t),
+              fontSize: 13, padding: '5px 8px', lineHeight: 1,
+            }}
+            title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {dark ? '☀' : '☾'}
           </button>
         </div>
       </div>
@@ -239,7 +301,7 @@ export default function App() {
           {/* Custom Rules */}
           <div style={{ marginBottom: 18 }}>
             <div style={styles.sectionTitle}>Custom Words & Phrases</div>
-            <div style={{ fontSize: 10.5, color: '#3f3f46', marginBottom: 8 }}>
+            <div style={{ fontSize: 10.5, color: t.textMuted, marginBottom: 8 }}>
               Add names, companies, projects, or locations — replaced with matching fake data
             </div>
             <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
@@ -260,8 +322,8 @@ export default function App() {
                 value={newRuleType}
                 onChange={(e) => setNewRuleType(e.target.value)}
                 style={{
-                  background: '#0e0e11', border: '1px solid #1e1e22', borderRadius: 5,
-                  padding: '7px 8px', color: '#d4d4d8', fontSize: 11, outline: 'none',
+                  background: t.bgInput, border: `1px solid ${t.borderInput}`, borderRadius: 5,
+                  padding: '7px 8px', color: t.text, fontSize: 11, outline: 'none',
                   fontFamily: font, cursor: 'pointer',
                 }}
               >
@@ -273,7 +335,7 @@ export default function App() {
               </select>
               <label style={{
                 display: 'flex', alignItems: 'center', gap: 3,
-                fontSize: 10, color: '#52525b', cursor: 'pointer', whiteSpace: 'nowrap',
+                fontSize: 10, color: t.textDim, cursor: 'pointer', whiteSpace: 'nowrap',
               }}>
                 <input
                   type="checkbox"
@@ -294,7 +356,7 @@ export default function App() {
             {duplicateWarning && (
               <div style={{
                 fontSize: 10.5, color: '#f87171', marginBottom: 8,
-                padding: '5px 8px', background: '#1c1012', border: '1px solid #2d1519',
+                padding: '5px 8px', background: t.errorBg, border: `1px solid ${t.errorBorder}`,
                 borderRadius: 4,
               }}>
                 {duplicateWarning}
@@ -311,11 +373,15 @@ export default function App() {
                     <span key={rule.id} style={customChip}>
                       <span style={{ fontSize: 10 }}>{typeLabel}</span>
                       <span style={{ color: TAG_COLORS[rule.tag] || '#e44d26' }}>{rule.text}</span>
-                      {rule.caseSensitive && <span style={{ color: '#3f3f46', fontSize: 8 }}>Aa</span>}
-                      <span
+                      {rule.caseSensitive && <span style={{ color: t.textMuted, fontSize: 8 }}>Aa</span>}
+                      <button
                         onClick={() => removeCustomRule(rule.id)}
-                        style={{ color: '#3f3f46', cursor: 'pointer', fontSize: 13, lineHeight: 1 }}
-                      >×</span>
+                        style={{
+                          color: t.textMuted, cursor: 'pointer', fontSize: 13, lineHeight: 1,
+                          background: 'none', border: 'none', padding: 0, fontFamily: font,
+                        }}
+                        aria-label={`Remove ${rule.text}`}
+                      >×</button>
                     </span>
                   );
                 })}
@@ -327,10 +393,10 @@ export default function App() {
           <div style={styles.sectionTitle}>Auto-Detection</div>
           {groups.map((group) => (
             <div key={group} style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 10, color: '#52525b', marginBottom: 5 }}>{group}</div>
+              <div style={{ fontSize: 10, color: t.textDim, marginBottom: 5 }}>{group}</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
                 {patterns.filter((p) => p.group === group).map((p) => (
-                  <button key={p.id} onClick={() => togglePattern(p.id)} style={chip(p.enabled)}>
+                  <button key={p.id} onClick={() => togglePattern(p.id)} style={chip(p.enabled, t)}>
                     {p.enabled ? '●' : '○'} {p.label}
                   </button>
                 ))}
@@ -344,21 +410,21 @@ export default function App() {
       {showMapping && (
         <div style={styles.settingsPanel}>
           <div style={styles.sectionTitle}>Rehydrate AI Response</div>
-          <div style={{ fontSize: 10.5, color: '#3f3f46', marginBottom: 10 }}>
+          <div style={{ fontSize: 10.5, color: t.textMuted, marginBottom: 10 }}>
             Paste the AI's response — dummy data gets swapped back to your real data
           </div>
           {mapping.length === 0 ? (
-            <div style={{ fontSize: 11, color: '#27272a', padding: '16px 0', textAlign: 'center' }}>
+            <div style={{ fontSize: 11, color: t.textFaint, padding: '16px 0', textAlign: 'center' }}>
               No replacements yet — scrub some text first
             </div>
           ) : (
             <>
               <div style={{
-                marginBottom: 10, background: '#0e0e11', borderRadius: 5,
-                padding: 10, border: '1px solid #1e1e22',
+                marginBottom: 10, background: t.bgInput, borderRadius: 5,
+                padding: 10, border: `1px solid ${t.borderInput}`,
               }}>
                 <div style={{
-                  fontSize: 9, color: '#3f3f46', marginBottom: 6,
+                  fontSize: 9, color: t.textMuted, marginBottom: 6,
                   textTransform: 'uppercase', letterSpacing: '0.1em',
                 }}>
                   Mapping Table
@@ -372,8 +438,8 @@ export default function App() {
                       {m.tag}
                     </span>
                     <code style={{ color: TAG_COLORS[m.tag] || '#888' }}>{m.fake}</code>
-                    <span style={{ color: '#27272a' }}>←</span>
-                    <code style={{ color: '#71717a' }}>{m.original}</code>
+                    <span style={{ color: t.textFaint }}>←</span>
+                    <code style={{ color: t.textBody }}>{m.original}</code>
                   </div>
                 ))}
               </div>
@@ -382,8 +448,8 @@ export default function App() {
                 onChange={(e) => setRehydrateInput(e.target.value)}
                 placeholder="Paste AI response here..."
                 style={{
-                  ...styles.textarea, flex: 'none', minHeight: 150, background: '#0e0e11',
-                  border: '1px solid #1e1e22', borderRadius: 5, padding: 10, boxSizing: 'border-box',
+                  ...styles.textarea, flex: 'none', minHeight: 150, background: t.bgInput,
+                  border: `1px solid ${t.borderInput}`, borderRadius: 5, padding: 10, boxSizing: 'border-box',
                   resize: 'vertical', maxHeight: 400,
                 }}
               />
@@ -393,7 +459,7 @@ export default function App() {
                     display: 'flex', justifyContent: 'space-between',
                     alignItems: 'center', marginBottom: 5,
                   }}>
-                    <span style={{ fontSize: 10, color: '#52525b' }}>Restored:</span>
+                    <span style={{ fontSize: 10, color: t.textDim }}>Restored:</span>
                     <button
                       onClick={() => copyToClipboard(rehydratedText, setRehydratedCopied)}
                       style={copyBtn(rehydratedCopied)}
@@ -402,8 +468,8 @@ export default function App() {
                     </button>
                   </div>
                   <div style={{
-                    background: '#0e0e11', border: '1px solid #1e1e22', borderRadius: 5,
-                    padding: 10, fontSize: 11.5, color: '#d4d4d8', whiteSpace: 'pre-wrap',
+                    background: t.bgInput, border: `1px solid ${t.borderInput}`, borderRadius: 5,
+                    padding: 10, fontSize: 11.5, color: t.text, whiteSpace: 'pre-wrap',
                     maxHeight: 300, overflowY: 'auto', lineHeight: 1.6,
                   }}>
                     {rehydratedText}
@@ -429,8 +495,8 @@ export default function App() {
                 fontSize: 12, fontWeight: 700, color: '#fff', flexShrink: 0,
               }}>1</div>
               <div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: '#fafafa', marginBottom: 3 }}>Scrub</div>
-                <div style={{ fontSize: 11, color: '#71717a', lineHeight: 1.6 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: t.textBright, marginBottom: 3 }}>Scrub</div>
+                <div style={{ fontSize: 11, color: t.textBody, lineHeight: 1.6 }}>
                   Paste your text in the left panel. Sensitive data like emails, API keys, phone numbers,
                   and private keys are automatically detected and replaced with realistic dummy values.
                 </div>
@@ -445,8 +511,8 @@ export default function App() {
                 fontSize: 12, fontWeight: 700, color: '#fff', flexShrink: 0,
               }}>2</div>
               <div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: '#fafafa', marginBottom: 3 }}>Copy & Use AI</div>
-                <div style={{ fontSize: 11, color: '#71717a', lineHeight: 1.6 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: t.textBright, marginBottom: 3 }}>Copy & Use AI</div>
+                <div style={{ fontSize: 11, color: t.textBody, lineHeight: 1.6 }}>
                   Hit <span style={{ color: '#e44d26' }}>Copy</span> on the scrubbed output and paste it into
                   ChatGPT, Claude, or any AI service. The AI processes your request using fake data —
                   your real data never touches their servers.
@@ -462,8 +528,8 @@ export default function App() {
                 fontSize: 12, fontWeight: 700, color: '#fff', flexShrink: 0,
               }}>3</div>
               <div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: '#fafafa', marginBottom: 3 }}>Rehydrate</div>
-                <div style={{ fontSize: 11, color: '#71717a', lineHeight: 1.6 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: t.textBright, marginBottom: 3 }}>Rehydrate</div>
+                <div style={{ fontSize: 11, color: t.textBody, lineHeight: 1.6 }}>
                   Click <span style={{ color: '#e44d26' }}>↩ Rehydrate</span> and paste the AI's response.
                   All dummy values get swapped back to your originals. You get a fully personalized
                   response without the AI ever seeing your real data.
@@ -473,20 +539,20 @@ export default function App() {
           </div>
 
           <div style={{
-            marginTop: 16, paddingTop: 12, borderTop: '1px solid #1e1e22',
+            marginTop: 16, paddingTop: 12, borderTop: `1px solid ${t.borderInput}`,
           }}>
             <div style={{ ...styles.sectionTitle, marginTop: 4 }}>Tips</div>
-            <div style={{ fontSize: 11, color: '#71717a', lineHeight: 1.7 }}>
+            <div style={{ fontSize: 11, color: t.textBody, lineHeight: 1.7 }}>
               <div style={{ marginBottom: 6 }}>
-                <span style={{ color: '#a1a1aa' }}>Custom rules</span> — Click ⚙ Rules to add names,
+                <span style={{ color: t.text }}>Custom rules</span> — Click ⚙ Rules to add names,
                 company names, or project codenames. These get replaced with realistic fake names.
               </div>
               <div style={{ marginBottom: 6 }}>
-                <span style={{ color: '#a1a1aa' }}>Toggle patterns</span> — Not everything needs scrubbing.
+                <span style={{ color: t.text }}>Toggle patterns</span> — Not everything needs scrubbing.
                 Disable patterns you don't need to reduce false positives.
               </div>
               <div>
-                <span style={{ color: '#a1a1aa' }}>Same in, same out</span> — If the same email appears
+                <span style={{ color: t.text }}>Same in, same out</span> — If the same email appears
                 5 times, it maps to the same fake email every time, keeping the text coherent.
               </div>
             </div>
@@ -498,8 +564,8 @@ export default function App() {
       {showAbout && (
         <div style={styles.settingsPanel}>
           <div style={styles.sectionTitle}>About</div>
-          <div style={{ fontSize: 12, color: '#a1a1aa', lineHeight: 1.7, marginBottom: 16 }}>
-            <strong style={{ color: '#fafafa' }}>scrub.txt</strong> is a client-side data scrubber
+          <div style={{ fontSize: 12, color: t.textBody, lineHeight: 1.7, marginBottom: 16 }}>
+            <strong style={{ color: t.textBright }}>scrubtxt</strong> is a client-side data scrubber
             for safely using AI services. Paste your text, sensitive data gets replaced with
             realistic dummy values, copy it into any AI, then rehydrate the response with your
             real data. Nothing ever leaves your browser.
@@ -507,15 +573,15 @@ export default function App() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 10, color: '#3f3f46', textTransform: 'uppercase', letterSpacing: '0.1em', width: 60, flexShrink: 0 }}>Version</span>
-              <span style={{ fontSize: 11.5, color: '#d4d4d8' }}>0.1.0</span>
+              <span style={{ fontSize: 10, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '0.1em', width: 60, flexShrink: 0 }}>Version</span>
+              <span style={{ fontSize: 11.5, color: t.text }}>0.1.0</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 10, color: '#3f3f46', textTransform: 'uppercase', letterSpacing: '0.1em', width: 60, flexShrink: 0 }}>License</span>
-              <span style={{ fontSize: 11.5, color: '#d4d4d8' }}>MIT</span>
+              <span style={{ fontSize: 10, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '0.1em', width: 60, flexShrink: 0 }}>License</span>
+              <span style={{ fontSize: 11.5, color: t.text }}>MIT</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 10, color: '#3f3f46', textTransform: 'uppercase', letterSpacing: '0.1em', width: 60, flexShrink: 0 }}>Source</span>
+              <span style={{ fontSize: 10, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '0.1em', width: 60, flexShrink: 0 }}>Source</span>
               <a
                 href="https://github.com/springdom/scrub-txt"
                 target="_blank"
@@ -526,7 +592,7 @@ export default function App() {
               </a>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 10, color: '#3f3f46', textTransform: 'uppercase', letterSpacing: '0.1em', width: 60, flexShrink: 0 }}>Built by</span>
+              <span style={{ fontSize: 10, color: t.textMuted, textTransform: 'uppercase', letterSpacing: '0.1em', width: 60, flexShrink: 0 }}>Built by</span>
               <a
                 href="https://github.com/springdom"
                 target="_blank"
@@ -539,8 +605,8 @@ export default function App() {
           </div>
 
           <div style={{
-            marginTop: 16, paddingTop: 12, borderTop: '1px solid #1e1e22',
-            fontSize: 10.5, color: '#3f3f46', lineHeight: 1.6,
+            marginTop: 16, paddingTop: 12, borderTop: `1px solid ${t.borderInput}`,
+            fontSize: 10.5, color: t.textMuted, lineHeight: 1.6,
           }}>
             100% open source · Zero tracking · No backend · No cookies · Works offline
           </div>
@@ -553,9 +619,9 @@ export default function App() {
           <span style={{ fontSize: 10.5, color: '#e44d26', fontWeight: 600 }}>
             {stats.total} item{stats.total !== 1 ? 's' : ''} scrubbed
           </span>
-          {Object.entries(stats.byType).map(([t, count]) => (
-            <span key={t} style={{ ...tag(TAG_COLORS[t] || '#888'), fontSize: 9.5 }}>
-              {t} ×{count}
+          {Object.entries(stats.byType).map(([tp, count]) => (
+            <span key={tp} style={{ ...tag(TAG_COLORS[tp] || '#888'), fontSize: 9.5 }}>
+              {tp} ×{count}
             </span>
           ))}
         </div>
@@ -564,7 +630,7 @@ export default function App() {
       {/* ── Main Panels ── */}
       <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
         {/* Input */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', borderRight: '1px solid #18181b', minHeight: 0 }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', borderRight: `1px solid ${t.border}`, minHeight: 0 }}>
           <div style={styles.panelHeader}>
             <span style={styles.panelLabel}>Paste your text</span>
             {input && <button onClick={() => setInput('')} style={smallBtn}>Clear</button>}

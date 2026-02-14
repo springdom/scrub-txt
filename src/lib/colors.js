@@ -50,6 +50,16 @@ export const TAG_COLORS = {
   SECRET: '#f87171',
   ENTROPY: '#facc15',
 
+  // Identifiers
+  UUID: '#94a3b8',
+
+  // Financial
+  IBAN: '#f59e0b',
+
+  // Crypto
+  BTC: '#f7931a',
+  ETH: '#627eea',
+
   // Network
   IP: '#34d399',
   MAC: '#6ee7b7',

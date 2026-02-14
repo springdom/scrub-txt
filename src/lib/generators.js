@@ -54,12 +54,12 @@ export function createGenerators() {
 
     API_KEY: () => {
       const i = c('API_KEY');
-      return `sk-dummy-key-${'0'.repeat(20)}${pad(i)}`;
+      return `dummy-api-key-${'0'.repeat(20)}${pad(i)}`;
     },
 
     AWS_KEY: () => {
       const i = c('AWS_KEY');
-      return `AKIADUMMY${'X'.repeat(12)}${pad(i)}`;
+      return `AKIA_DUMMY_KEY_${pad(i, 6)}`;
     },
 
     JWT: () => {
@@ -276,6 +276,26 @@ export function createGenerators() {
     CUSTOM_OTHER: () => {
       const i = c('CUSTOM_OTHER');
       return `REDACTED_${i}`;
+    },
+
+    UUID: () => {
+      const i = c('UUID');
+      return `00000000-0000-4000-8000-${pad(i, 12)}`;
+    },
+
+    IBAN: () => {
+      const i = c('IBAN');
+      return `GB00 DUMM Y000 0000 ${pad(i, 4)}`;
+    },
+
+    BTC: () => {
+      const i = c('BTC');
+      return `1DummyBtcAddress${pad(i, 18)}`;
+    },
+
+    ETH: () => {
+      const i = c('ETH');
+      return `0x${'0'.repeat(36)}${pad(i, 4)}`;
     },
 
     // Legacy fallback

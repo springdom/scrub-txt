@@ -9,11 +9,11 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'scrub.txt',
-        short_name: 'scrub.txt',
+        name: 'scrubtxt',
+        short_name: 'scrubtxt',
         description: 'Client-side data scrubber for safely using AI services',
         theme_color: '#e44d26',
-        background_color: '#08080a',
+        background_color: '#0a0a0a',
         display: 'standalone',
         icons: [
           {

@@ -82,7 +82,17 @@ export const PATTERNS = [
     group: 'Financial',
     validate: (match) => {
       const digits = match.replace(/\D/g, '');
-      return digits.length >= 13 && digits.length <= 19;
+      if (digits.length < 13 || digits.length > 19) return false;
+      // Luhn algorithm
+      let sum = 0;
+      let alt = false;
+      for (let i = digits.length - 1; i >= 0; i--) {
+        let n = parseInt(digits[i], 10);
+        if (alt) { n *= 2; if (n > 9) n -= 9; }
+        sum += n;
+        alt = !alt;
+      }
+      return sum % 10 === 0;
     },
   },
 
@@ -473,7 +483,7 @@ export const PATTERNS = [
     id: 'vercel_token',
     label: 'Vercel Tokens',
     enabled: true,
-    regex: /(?:vercel_|vc_prod_|vc_)[A-Za-z0-9]{20,}/gi,
+    regex: /(?:vercel_|vc_prod_|vc_)[A-Za-z0-9]{20,}/g,
     tag: 'API_KEY',
     group: 'Keys & Secrets',
   },
@@ -628,6 +638,54 @@ export const PATTERNS = [
     regex: /\b[0-9A-Fa-f]{2}(?:[:-][0-9A-Fa-f]{2}){5}\b/g,
     tag: 'MAC',
     group: 'Network',
+  },
+
+  // ══════════════════════════════════════
+  // ── Identifiers ──
+  // ══════════════════════════════════════
+  {
+    id: 'uuid',
+    label: 'UUID / GUID',
+    enabled: false,
+    regex: /\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}\b/g,
+    tag: 'UUID',
+    group: 'Identifiers',
+  },
+
+  // ══════════════════════════════════════
+  // ── Crypto ──
+  // ══════════════════════════════════════
+  {
+    id: 'btc_address',
+    label: 'Bitcoin (BTC)',
+    enabled: false,
+    regex: /\b(?:1[1-9A-HJ-NP-Za-km-z]{25,34}|3[1-9A-HJ-NP-Za-km-z]{25,34}|bc1[0-9a-z]{39,59})\b/g,
+    tag: 'BTC',
+    group: 'Crypto',
+  },
+  {
+    id: 'eth_address',
+    label: 'Ethereum (ETH)',
+    enabled: false,
+    regex: /\b0x[0-9a-fA-F]{40}\b/g,
+    tag: 'ETH',
+    group: 'Crypto',
+  },
+
+  // ══════════════════════════════════════
+  // ── Banking ──
+  // ══════════════════════════════════════
+  {
+    id: 'iban',
+    label: 'IBAN',
+    enabled: false,
+    regex: /\b[A-Z]{2}\d{2}[\s]?[\dA-Z]{4}[\s]?(?:[\dA-Z]{4}[\s]?){1,7}[\dA-Z]{1,4}\b/g,
+    tag: 'IBAN',
+    group: 'Banking',
+    validate: (match) => {
+      const cleaned = match.replace(/\s/g, '');
+      return cleaned.length >= 15 && cleaned.length <= 34;
+    },
   },
 ];
 
